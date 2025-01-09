@@ -1,0 +1,236 @@
+{
+  "interact": {
+    "magic": "APF_VER_1",
+    "variables": [
+      {
+				"name": "SNAC Adapter",
+				"id": 15,
+				"type": "list",
+				"enabled": true,
+				"persist": true,
+				"address": "0xF7000000",
+				"defaultval": "0x00",
+				"mask": "0xFFFFFFE0",
+				"options": [
+					{
+					"value": "0x00",
+					"name": "None"
+					},
+					{
+					"value": "0x01",
+					"name": "DB15 Normal"
+					},
+					{
+					"value": "0x02",
+					"name": "NES"
+					},
+					{
+					"value": "0x03",
+					"name": "SNES"
+					},
+					{
+					"value": "0x04",
+					"name": "PCE 2BTN"
+					},
+					{
+					"value": "0x05",
+					"name": "PCE 6BTN"
+					},
+					{
+					"value": "0x06",
+					"name": "PCE Multitap"
+					},
+					{
+					  "value": "0x09",
+					  "name": "DB15 Fast"
+					},
+					{
+					  "value": "0x0B",
+					  "name": "SNES A,B<->X,Y"
+					},
+                    {
+                        "value": "0x11",
+                        "name": "PSX (Digital DPAD)"
+                    },
+                    {
+                        "value": "0x13",
+                        "name": "PSX (Analog DPAD)"
+                    }
+				]
+			},
+			{
+				"name": "SNAC Controller Assignment",
+				"id":16,
+				"type": "list",
+				"enabled": true,
+				"persist": true,
+				"address": "0xF7000000",
+				"defaultval": "0x00",
+				"mask": "0xFFFFFC3F",
+				"options": [
+					{
+					  "value": "0x0",
+					  "name": "SNAC -> P1"
+					},
+					{
+					  "value": "0x40",
+					  "name": "SNAC -> P2"
+					},
+					{
+					  "value": "0x80",
+					  "name": "SNAC P1,P2->P1,P2"
+					},
+					{
+					  "value": "0xC0",
+					  "name": "SNAC P1,P2->P2,P1"
+					}
+				]
+			},
+      {
+				"name": "Analogizer Video Out",
+				"id": 17,
+				"type": "list",
+				"enabled": true,
+				"persist": true,
+				"address": "0xF7000000",
+				"defaultval": "0x0",
+				"mask": "0xFFFFC3FF",
+				"options": [
+					{
+					  "value": "0x0",
+					  "name": "RGBS"
+					},
+					{
+					  "value": "0x0400",
+					  "name": "RGsB"
+					},
+					{
+					  "value": "0x0800",
+					  "name": "YPbPr"
+					},
+					{
+					  "value": "0x0C00",
+					  "name": "Y/C NTSC"
+					},
+					{
+              "value": "0x1000",
+              "name": "Y/C PAL"
+          },
+					{
+					  "value": "0x1400",
+					  "name": "SC 0% RGBHV"
+					},
+          {
+              "value": "0x1800",
+              "name": "SC 50% RGBHV"
+          },
+          {
+              "value": "0x1C00",
+              "name": "SC HQ2x RGBHV"
+          },
+					{
+					  "value": "0x2000",
+					  "name": "RGBS,Pocket OFF"
+					},
+					{
+					  "value": "0x2400",
+					  "name": "RGsB,Pocket OFF"
+					},
+					{
+					  "value": "0x2800",
+					  "name": "YPbPr,Pocket OFF"
+					},            {
+					  "value": "0x2C00",
+					  "name": "Y/C NTSC,Pocket OFF"
+					},
+					{
+                        "value": "0x3000",
+                        "name": "Y/C PAL,Pocket OFF"
+                    },
+					{
+					  "value": "0x3400",
+					  "name": "SC 0% SC,Pocket OFF"
+					},
+          {
+              "value": "0x3800",
+              "name": "SC 50% RGBHV,Pocket OFF"
+          },
+          {
+              "value": "0x3C00",
+              "name": "SC HQ2x RGBHV,Pocket OFF"
+          }
+				]
+			},
+      {
+        "name": "Debug",
+        "id": 1,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf9000008",
+        "writeonly": true,
+        "defaultval": 0,
+        "value": 1
+      },
+      {
+        "name": "Layer 0",
+        "id": 2,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf900000c",
+        "writeonly": true,
+        "defaultval": 1,
+        "value": 1
+      },
+      {
+        "name": "Layer 1",
+        "id": 3,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf9000010",
+        "writeonly": true,
+        "defaultval": 1,
+        "value": 1
+      },
+      {
+        "name": "Layer 2",
+        "id": 4,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf9000014",
+        "writeonly": true,
+        "defaultval": 1,
+        "value": 1
+      },
+      {
+        "name": "Sprites",
+        "id": 5,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf9000018",
+        "writeonly": true,
+        "defaultval": 1,
+        "value": 1
+      },
+      {
+        "name": "FM",
+        "id": 6,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf900001c",
+        "writeonly": true,
+        "defaultval": 1,
+        "value": 1
+      },
+      {
+        "name": "PCM",
+        "id": 7,
+        "type": "check",
+        "enabled": true,
+        "address": "0xf9000020",
+        "writeonly": true,
+        "defaultval": 1,
+        "value": 1
+      }
+    ]
+  }
+}
