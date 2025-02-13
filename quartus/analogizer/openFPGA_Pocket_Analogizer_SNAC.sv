@@ -75,7 +75,7 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
     input wire conf_AB, //0 conf. A(default), 1 conf. B (see graph above)
     input wire [4:0] game_cont_type, //0-15 Conf. A, 16-31 Conf. B
     //input wire [2:0] game_cont_sample_rate, //0 compatibility mode (slowest), 1 normal mode, 2 fast mode, 3 superfast mode
-    //PSX rumble interface joy1, joy2
+        //PSX rumble interface joy1, joy2
     input [1:0] i_VIB_SW1,  //  Vibration SW  VIB_SW[0] Small Moter OFF 0:ON  1:
                                 //VIB_SW[1] Bic Moter   OFF 0:ON  1(Dualshook Only)
 	input [7:0] i_VIB_DAT1,  //  Vibration(Bic Moter)Data   8'H00-8'HFF (Dualshook Only)
@@ -104,16 +104,16 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
     output wire o_stb
 ); 
     //
-    logic SNAC_OUT1 /* synthesis preserve */; //cart_tran_bank1[6]                                           D-
-    logic SNAC_OUT2 /* synthesis preserve */; //cart_tran_bank1[7]                                           D+
-    logic SNAC_IO3_A /* synthesis preserve */;//Conf.A: cart_tran_bank0[4] (in),  Conf.B: pin30(out)         RX- 
-    logic SNAC_IO3_B /* synthesis preserve */;//Conf.B: cart_tran_bank0[4] (in),  Conf.B: pin30(out)         RX-
-    logic SNAC_IN4 /* synthesis preserve */;  //cart_tran_bank0[7]                                           RX+
-    logic SNAC_IO5_A /* synthesis preserve */;//Conf.A: pin30(out),               Conf.B: cart_tran_bank1[6] GND_D
-	 logic SNAC_IO5_B /* synthesis preserve */;//Conf.A: pin30(out),               Conf.B: cart_tran_bank1[6] GND_D
-    logic SNAC_IO6_A /* synthesis preserve */;//Conf.A: pin31(in),                Conf.B: pin31(out)         TX-
-    logic SNAC_IO6_B /* synthesis preserve */;//Conf.A: pin31(in),                Conf.B: pin31(out)         TX-
-    logic SNAC_IN7 /* synthesis preserve */;   //cart_tran_bank0[5]                                          TX+
+    logic SNAC_OUT1 ; //cart_tran_bank1[6]                                           D-
+    logic SNAC_OUT2 ; //cart_tran_bank1[7]                                           D+
+    logic SNAC_IO3_A ;//Conf.A: cart_tran_bank0[4] (in),  Conf.B: pin30(out)         RX- 
+    logic SNAC_IO3_B ;//Conf.B: cart_tran_bank0[4] (in),  Conf.B: pin30(out)         RX-
+    logic SNAC_IN4 ;  //cart_tran_bank0[7]                                           RX+
+    logic SNAC_IO5_A ;//Conf.A: pin30(out),               Conf.B: cart_tran_bank1[6] GND_D
+	 logic SNAC_IO5_B ;//Conf.A: pin30(out),               Conf.B: cart_tran_bank1[6] GND_D
+    logic SNAC_IO6_A ;//Conf.A: pin31(in),                Conf.B: pin31(out)         TX-
+    logic SNAC_IO6_B ;//Conf.A: pin31(in),                Conf.B: pin31(out)         TX-
+    logic SNAC_IN7 ;   //cart_tran_bank0[5]                                          TX+
     
     //calculate step sizes for fract clock enables
     // localparam pce_compat_polling_freq    =  20_000; //  20_000 / 5 =   4K samples/sec PCE
@@ -131,7 +131,7 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
 
     localparam psx_normal_polling_freq = 125_000;
     localparam psx_fast_polling_freq = 250_000;
-    localparam psx_ultra_fast_polling_freq = 500_000;
+        localparam psx_ultra_fast_polling_freq = 500_000;
     localparam psx_multitap_polling_freq = 1_000_000;
 
     // localparam uart_dbg_freq = 500_000 * 16; //115_200 * 16;
@@ -153,7 +153,7 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
     localparam [32:0] psx_fast_pstep    = psx_fast_pstep_[32:0];
     localparam [64:0] psx_normal_pstep_   = ((MAX_INT / (MASTER_CLK_FREQ / 1000)) * psx_normal_polling_freq * 2) / 1000;
     localparam [32:0] psx_normal_pstep    = psx_normal_pstep_[32:0];
-    localparam [64:0] psx_ultra_fast_pstep_   = ((MAX_INT / (MASTER_CLK_FREQ / 1000)) * psx_ultra_fast_polling_freq * 2) / 1000;
+        localparam [64:0] psx_ultra_fast_pstep_   = ((MAX_INT / (MASTER_CLK_FREQ / 1000)) * psx_ultra_fast_polling_freq * 2) / 1000;
     localparam [32:0] psx_ultra_fast_pstep    = psx_ultra_fast_pstep_[32:0];
     localparam [64:0] psx_multitap_pstep_   = ((MAX_INT / (MASTER_CLK_FREQ / 1000)) * psx_multitap_polling_freq * 2) / 1000;
     localparam [32:0] psx_multitap_pstep    = psx_multitap_pstep_[32:0];
@@ -278,7 +278,7 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
                 strobe_step_size <= pce_fast_pstep;
             end
             
-            default: begin//disabled
+           default: begin//disabled
                 serlat_ena <= 1'b0;
                 pce_ena    <= 1'b0;
                 psx_ena    <= 1'b0;
@@ -310,8 +310,8 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
         endcase
     end
                                                
-    wire stb_clk /* synthesis keep */;
-    clock_divider_fract ckdiv(
+    wire stb_clk ;
+    clock_divider_fract ckdiv( 
     .i_clk (i_clk),
     .i_rst(reset_on_change), //reset on polling freq change
     .i_step(strobe_step_size[31:0]),
@@ -334,8 +334,8 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
     //PSX game controller for 1/2 players
     wire [15:0] psx_key1, psx_key2;
     wire [31:0] psx_joy1, psx_joy2;
-    wire PSX_SNAC_OUT1 /* synthesis keep */;
-    wire PSX_SNAC_OUT2 /* synthesis keep */;
+    wire PSX_SNAC_OUT1 ;
+    wire PSX_SNAC_OUT2 ;
     analogizer_psx #(.MASTER_CLK_FREQ(MASTER_CLK_FREQ)) psx (
         .i_clk(i_clk),
         .i_rst(reset_on_change),
@@ -359,11 +359,19 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
     //assign PSX_SNAC_OUT2 = 1'b1;
 
     //DB15/NES/SNES game controller
-    wire [15:0] sl_p1 /* synthesis keep */;
-    wire [15:0] sl_p2 /* synthesis keep */;
-    wire SERLAT_SNAC_OUT1 /* synthesis keep */;
-    wire SERLAT_SNAC_OUT2 /* synthesis keep */;
+    wire [15:0] sl_p1 ;
+    wire [15:0] sl_p2 ;
+    wire SERLAT_SNAC_OUT1 ;
+    wire SERLAT_SNAC_OUT2 ;
+    reg [1:0] i_D3_r;
+    reg [1:0] i_D4_r;
     //wire SERLAT_SNAC_IO5_A /* synthesis keep */;
+    
+    //shift in D3 and D4 from SNAC_IN4 and SNAC_IO6_A for NES Zapper controller
+    always @(posedge i_clk) begin
+        i_D3_r <= {i_D3_r[0],SNAC_IO6_A};
+        i_D4_r <= {i_D4_r[0],SNAC_IN4};
+    end
     serlatch_game_controller #(.MASTER_CLK_FREQ(MASTER_CLK_FREQ)) slgc
     (
         .i_clk(i_clk),
@@ -382,9 +390,9 @@ module openFPGA_Pocket_Analogizer_SNAC #(parameter MASTER_CLK_FREQ=50_000_000)
     );
 
     //PCENGINE game controller
-    wire [15:0] pce_p1 /* synthesis keep */;
-    wire PCE_SNAC_OUT1 /* synthesis keep */;
-    wire PCE_SNAC_OUT2 /* synthesis keep */;
+    wire [15:0] pce_p1 ;
+    wire PCE_SNAC_OUT1 ;
+    wire PCE_SNAC_OUT2 ;
 
     pcengine_game_controller #(.MASTER_CLK_FREQ(MASTER_CLK_FREQ), .PULSE_CLR_LINE(1'b1)) pcegc1
     (
@@ -434,11 +442,21 @@ pcengine_game_controller_multitap #(.MASTER_CLK_FREQ(MASTER_CLK_FREQ)) pcegmutit
             p3_btn_state = 16'h0; 
             p4_btn_state = 16'h0;
         end
-        GC_DB15, GC_DB15_FAST, GC_NES, GC_SNES, GC_SNES_SWAP: begin
+        GC_DB15, GC_DB15_FAST, GC_SNES, GC_SNES_SWAP: begin
             SNAC_OUT1 = SERLAT_SNAC_OUT1;
             SNAC_OUT2 = SERLAT_SNAC_OUT2;            
             p1_btn_state = sl_p1;
-            p2_btn_state = sl_p2; 
+            p2_btn_state = sl_p2;
+            p3_btn_state = 16'h0; 
+            p4_btn_state = 16'h0;
+
+        end
+        //added special case for NES Zapper
+        GC_NES: begin
+            SNAC_OUT1 = SERLAT_SNAC_OUT1;
+            SNAC_OUT2 = SERLAT_SNAC_OUT2;            
+            p1_btn_state = sl_p1; //{sl_p1[15:8], ~i_D4_r[1], ~i_D3_r[1], sl_p1[5:0]};  //insert D4 and D3 at 7 and 6 bit positions (X,Y buttons)                            
+            p2_btn_state = {sl_p2[15:8], ~i_D4_r[1], ~i_D3_r[1], sl_p2[5:0]};
             p3_btn_state = 16'h0; 
             p4_btn_state = 16'h0;
 

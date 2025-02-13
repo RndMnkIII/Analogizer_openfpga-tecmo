@@ -78,9 +78,9 @@ module dualshock_controller #(
    output reg [7:0] o_RXD_6          //  RX DATA 6 (8bit) 
 );
 
-reg i_CLK /* synthesis preserve */;          // SPI clock at 125Khz 
+reg i_CLK ;          // SPI clock at 125Khz 
                     // some cheap controllers cannot handle the nominal 250Khz
-reg R_CE, F_CE /* synthesis preserve */;     // rising and falling edge pulses of i_CLK
+reg R_CE, F_CE ;     // rising and falling edge pulses of i_CLK
 
 // Generate i_CLK, F_CE, R_CE
 always @(posedge clk) begin
@@ -104,7 +104,7 @@ always @(posedge clk) begin
     end
 end
 
-reg device_id_type /* synthesis preserve */; //1'b1 digital one, 1'b0 analog one
+reg device_id_type ; //1'b1 digital one, 1'b0 analog one
 always @(posedge clk) begin
     if(! i_RSTn) device_id_type <= 1'b0; 
     else if (W_byte_cnt == 2) begin
@@ -121,14 +121,14 @@ always @(posedge clk) begin
     end
 end
 
-wire   W_type = 1'b1 /* synthesis keep */;        // DIGITAL PAD 0, ANALOG PAD 1
-wire   [3:0] W_byte_cnt /* synthesis keep */;
-wire   W_RXWT /* synthesis keep */;
-wire   W_TXWT /* synthesis keep */;
-wire   W_TXEN /* synthesis keep */;
-wire   W_TXSET /* synthesis keep */;
+wire   W_type = 1'b1 ;        // DIGITAL PAD 0, ANALOG PAD 1
+wire   [3:0] W_byte_cnt ;
+wire   W_RXWT ;
+wire   W_TXWT ;
+wire   W_TXEN ;
+wire   W_TXSET ;
 reg    [7:0]W_TXD_DAT /* synthesis noprune */;
-wire   [7:0]W_RXD_DAT /* synthesis keep */;
+wire   [7:0]W_RXD_DAT ;
 
 ps_pls_gan pls(
    .clk(clk), .R_CE(R_CE), .i_CLK(i_CLK), .i_RSTn(i_RSTn), .i_TYPE(device_id_type), 
@@ -171,7 +171,7 @@ end
 // 7 Dual Analog & Dual Shock 1/2 (Analog Mode)           3-8
 // 8 MultiTap                                             disabled: based on device ID connected, enabled: 16 (4x8)
 
-reg W_RXWT_r /* synthesis preserve */;
+reg W_RXWT_r ;
 
 always @(posedge clk) begin
     W_RXWT_r <= W_RXWT;
@@ -213,12 +213,12 @@ module ps_pls_gan(
 
 parameter Timer_size = `Timer_siz;
 
-reg [3:0] o_byte_cnt_r /* synthesis preserve */;
-reg [`Timer_siz-1:0] Timer /* synthesis preserve */;
-reg RXWT, TXWT, TXSET /* synthesis preserve */;
-reg psCLK_gate /* synthesis preserve */;                 // 0: send i_CLK on wire
-reg psATT1 /* synthesis preserve */;         
-reg psATT2 /* synthesis preserve */;        
+reg [3:0] o_byte_cnt_r ;
+reg [`Timer_siz-1:0] Timer ;
+reg RXWT, TXWT, TXSET ;
+reg psCLK_gate ;                 // 0: send i_CLK on wire
+reg psATT1 ;         
+reg psATT2 ;        
 
 // increment timer on i_CLK rising edge
 always @(posedge clk) begin

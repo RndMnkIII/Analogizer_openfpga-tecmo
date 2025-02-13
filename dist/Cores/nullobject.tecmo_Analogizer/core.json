@@ -2,17 +2,20 @@
   "core": {
     "magic": "APF_VER_1",
     "metadata": {
-      "platform_ids": ["tecmo_Analogizer"],
-      "shortname": "tecmo",
+      "platform_ids": [
+        "tecmo",
+        "analogizer"
+      ],
+      "shortname": "tecmo_Analogizer",
       "description": "[Analogizer] Tecmo arcade core.",
       "author": "nullobject",
-      "url": "https://github.com/nullobject/pocket-tecmo",
+      "url": "https://github.com/RndMnkIII/Analogizer_openfpga-tecmo",
       "version": "2.1",
-      "date_release": "2025-01-10"
+      "date_release": "2025-02-13"
     },
     "framework": {
       "target_product": "Analogue Pocket",
-      "version_required": "1.1",
+      "version_required": "2.1",
       "sleep_supported": false,
       "dock": {
         "supported": true,

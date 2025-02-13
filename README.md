@@ -1,7 +1,12 @@
 
 # Analogizer openFPGA Tecmo core for Analogue Pocket
 
-* [2.1] **Analogizer** support added by **RndMnkIII** and based on **nullobject** openfpga-tecmo Pocket port. See more in the Analogizer main repository: [Analogizer](https://github.com/RndMnkIII/Analogizer) [10/01/2025].
+* [2.1] **Analogizer** support added by **RndMnkIII** and based on **nullobject** openfpga-tecmo Pocket port. See more in the Analogizer main repository: [Analogizer](https://github.com/RndMnkIII/Analogizer) [13/02/2025].
+
+This Analogizer core use a configuration file to select Analogizer adapter options, not based on the Pocket's menu system. It is necessary to use [Pupdate](https://github.com/mattpannella/pupdate) release >= 4.3.1 or run an external [utility](https://github.com/RndMnkIII/AnalogizerConfigurator) to generate such a file. Once generated, you must copy the `analogizer.bin` file to the `/Assets/analogizer/common` folder on the Pocket SD card. If this folder does not exist, you must create it or if you have already extracted the Amiga core distribution file it will be created. Pupdate does all actions automatically after running this tool. Inside Pupdate navigate to: `Pocket Setup>Analogizer Config>Standard Analogizer Config`, choose Analogizer settings and exit to save to file.
+
+
+
 
 | Video output | Status | SOG Switch(Only R2,R3 Analogizer) |
 | :----------- | :----: | :-------------------------------: |     
@@ -38,12 +43,6 @@ Be careful when handling this switch. Use something with a thin, flat tip such a
    B|  O|A  A/B switch on position A
      ---
 ``` 
-
-The following options exist in the core menu to configure Analogizer:
-* **SNAC Adapter** List: None, DB15,NES,SNES,PCE,PCE Multitap, SNES swap A,B<->X,Y buttons, PSX (Digital DPAD), PSX (Analog DPAD), PSX (P1 Lightgun). The Lightgun option uses PSX Analogic stick as SNES Lightgun aiming track.
-* **SNAC Controller Assignment** List: several options about how to map SNAC controller to Pocket controls. The controls not mapped to SNAC by default will map to Pocket connected controllers (Pocket built-in or Dock).
-* **Analogizer Video Out** List: you can choose between RGBS (VGA to SCART), RGsB (works is a PVM as YPbPr but using RGB color space), YPbPr (for TV with component video input),
-Y/C NTSC or PAL (for SVideo o compositive video using Y/C Active adapter by Mike S11).
 
 **Analogizer** is responsible for generating the correct encoded Y/C signals from RGB and outputs to R,G pins of VGA port. Also redirects the CSync to VGA HSync pin.
 The required external Y/C adapter that connects to VGA port is responsible for output Svideo o composite video signal using his internal electronics. Oficially

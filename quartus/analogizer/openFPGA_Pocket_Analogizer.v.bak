@@ -70,7 +70,7 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
-module openFPGA_Pocket_Analogizer #(parameter MASTER_CLK_FREQ=50_000_000, parameter LINE_LENGTH, parameter ADDRESS_ANALOGIZER_CONFIG=8'hF7) (
+module openFPGA_Pocket_Analogizer #(parameter MASTER_CLK_FREQ=50_000_000, parameter LINE_LENGTH, parameter ADDRESS_ANALOGIZER_CONFIG = 8'hF7,) (
 	input  wire clk_74a,
 	input  wire i_clk,
     input  wire i_rst,
@@ -82,11 +82,12 @@ module openFPGA_Pocket_Analogizer #(parameter MASTER_CLK_FREQ=50_000_000, parame
 	input  wire [7:0] B,
 	input  wire Hblank,
 	input  wire Vblank,
+	input  wire BLANKn,
 	input  wire Hsync,
 	input  wire Vsync,
+	input  wire Csync,
 
 	//openFPGA Bridge interface
-	input wire bridge_endian_little,
 	input  wire [31:0] bridge_addr,
 	input  wire        bridge_rd,
 	output reg  [31:0] analogizer_bridge_rd_data,
@@ -145,44 +146,33 @@ module openFPGA_Pocket_Analogizer #(parameter MASTER_CLK_FREQ=50_000_000, parame
 	//reg [31:0] analogizer_bridge_rd_data;
 	reg  [31:0] analogizer_config = 0;
 	wire [31:0]   analogizer_config_s;
-	reg [31:0] config_mem [16]; //configuration memory
 	
 	synch_3 #(.WIDTH(32)) analogizer_sync(analogizer_config, analogizer_config_s, i_clk);
 
-	wire [31:0] memory_out;
-	reg [3:0] word_cnt;
 	// handle memory mapped I/O from pocket
 	always @(posedge clk_74a) begin
 		if(bridge_wr) begin
 			case(bridge_addr[31:24])
 			ADDRESS_ANALOGIZER_CONFIG: begin
-				if (bridge_addr[3:0] == 4'h0) begin
-					word_cnt <= 4'h1;
-					analogizer_config <= bridge_endian_little ? bridge_wr_data  : {bridge_wr_data[7:0],bridge_wr_data[15:8],bridge_wr_data[23:16],bridge_wr_data[31:24]}; 
-				end
-				else begin
-					word_cnt <= word_cnt + 4'h1;
-					config_mem[bridge_addr[3:0]] <= bridge_endian_little ? bridge_wr_data  : {bridge_wr_data[7:0],bridge_wr_data[15:8],bridge_wr_data[23:16],bridge_wr_data[31:24]}; 
-				end
+				analogizer_config <= {bridge_wr_data[7:0],bridge_wr_data[15:8],bridge_wr_data[23:16],bridge_wr_data[31:24]}; //read inverted byte order
 			end
 			endcase
 		end
 		if(bridge_rd) begin
 			case(bridge_addr[31:24])
 			ADDRESS_ANALOGIZER_CONFIG: begin
-				if (bridge_addr[3:0] == 4'h0) analogizer_bridge_rd_data <= bridge_endian_little ?  analogizer_config_s : {analogizer_config_s[7:0],analogizer_config_s[15:8],analogizer_config_s[23:16],analogizer_config_s[31:24]}; //invert byte order to writeback to the Sav folders
-				else analogizer_bridge_rd_data <= bridge_endian_little ? config_mem[bridge_addr[3:0]] : {memory_out[7:0],memory_out[15:8],memory_out[23:16],memory_out[31:24]};
+				analogizer_bridge_rd_data <= {analogizer_config_s[7:0],analogizer_config_s[15:8],analogizer_config_s[23:16],analogizer_config_s[31:24]}; //invert byte order to writeback to the Sav folders
 			end
 			endcase
 		end
 	end
-	assign memory_out = config_mem[bridge_addr[3:0]];
-
+	//
   always @(posedge i_clk) begin
     snac_game_cont_type   <= analogizer_config_s[4:0];
     snac_cont_assignment  <= analogizer_config_s[9:6];
-    analogizer_video_type <= analogizer_config_s[13:10];	
-	pocket_blank_screen   <= analogizer_config_s[14];
+    analogizer_video_type <= analogizer_config_s[13:10];
+	 //analogizer_ena	  <= analogizer_config_s[5];	
+	 pocket_blank_screen   <= analogizer_config_s[14];
     analogizer_osd_out2	  <= analogizer_config_s[15];
   end
 
@@ -251,36 +241,6 @@ assign analogizer_osd_out        = analogizer_osd_out2;
     	.o_stb(o_stb)
 	); 
 
-
-//---------------------------------------------------------------------
-// Fix video
-//---------------------------------------------------------------------
-wire  ANALOGIZER_DE = ~(HBL || VBL);
-wire ANALOGIZER_CSYNC = ~^{HS, VS};
-
-wire hs_fix,vs_fix;
-sync_fix sync_v(i_clk, Hsync, hs_fix);
-sync_fix sync_h(i_clk, Vsync, vs_fix);
-
-reg [7:0] R_fix,G_fix,B_fix;
-
-reg CE,HS,VS,HBL,VBL;
-always @(posedge i_clk) begin
-	reg old_ce;
-	old_ce <= ce_pix;
-	CE <= 0;
-	if(~old_ce & ce_pix) begin
-		CE <= 1;
-		HS <= hs_fix;
-		if(~HS & hs_fix) VS <= vs_fix;
-
-		{R_fix,G_fix,B_fix} <= {R,G,B};
-		HBL <= Hblank;
-		if(HBL & ~Hblank) VBL <= Vblank;
-	end
-end
-//---------------------------------------------------------------------------
-
 	//Choose type of analog video type of signal
 	reg [5:0] Rout, Gout, Bout ;
 	reg HsyncOut, VsyncOut, BLANKnOut ;
@@ -293,12 +253,12 @@ end
 	always @(*) begin
 		case(analogizer_video_type)
 			4'h0: begin //RGBS
-				Rout = R_fix[7:2]&{6{ANALOGIZER_DE}};
-				Gout = G_fix[7:2]&{6{ANALOGIZER_DE}};
-				Bout = B_fix[7:2]&{6{ANALOGIZER_DE}};
-				HsyncOut = ANALOGIZER_CSYNC;
+				Rout = R[7:2]&{6{BLANKn}};
+				Gout = G[7:2]&{6{BLANKn}};
+				Bout = B[7:2]&{6{BLANKn}};
+				HsyncOut = Csync;
 				VsyncOut = 1'b1;
-				BLANKnOut = ANALOGIZER_DE;
+				BLANKnOut = BLANKn;
 			end
 			4'h3, 4'h4: begin// Y/C Modes works for Analogizer R1, R2 Adapters
 				Rout = yc_o[23:18];
@@ -309,12 +269,12 @@ end
 				BLANKnOut = 1'b1;
 			end
 			4'h1: begin //RGsB
-				Rout = R_fix[7:2]&{6{ANALOGIZER_DE}};
-				Gout = G_fix[7:2]&{6{ANALOGIZER_DE}};
-				Bout = B_fix[7:2]&{6{ANALOGIZER_DE}};
+				Rout = R[7:2]&{6{BLANKn}};
+				Gout = G[7:2]&{6{BLANKn}};
+				Bout = B[7:2]&{6{BLANKn}};
 				HsyncOut = 1'b1;
-				VsyncOut = ANALOGIZER_CSYNC; //to DAC SYNC pin, SWITCH SOG ON
-				BLANKnOut = ANALOGIZER_DE;
+				VsyncOut = Csync; //to DAC SYNC pin, SWITCH SOG ON
+				BLANKnOut = BLANKn;
 			end
 			4'h2: begin //YPbPr
 				Rout = PrOut[7:2];
@@ -336,21 +296,49 @@ end
 				Rout = 6'h0;
 				Gout = 6'h0;
 				Bout = 6'h0;
-				HsyncOut = HS;
+				HsyncOut = Hsync;
 				VsyncOut = 1'b1;
-				BLANKnOut = ANALOGIZER_DE;
+				BLANKnOut = BLANKn;
 			end
 		endcase
 	end
+
+
+	//First Stage: video fix
+	// wire hs_fix,vs_fix;
+	// sync_fix sync_v(video_clk, HSync, hs_fix);
+	// sync_fix sync_h(video_clk, VSync, vs_fix);
+
+	// reg [DW-1:0] RGB_fix;
+
+	// reg CE_fix,HS_fix,VS_fix,HBL_fix,VBL_fix;
+	// always @(posedge video_clk) begin
+	// 	reg old_ce;
+	// 	old_ce <= ce_pix;
+	// 	CE_fix <= 0;
+	// 	if(~old_ce & ce_pix) begin
+	// 		CE_fix <= 1;
+	// 		HS_fix <= hs_fix;
+	// 		if(~HS_fix & hs_fix) VS_fix <= vs_fix;
+
+	// 		RGB_fix <= {R,G,B};
+	// 		HBL_fix <= HBlank;
+	// 		if(HBL_fix & ~HBlank) VBL_fix <= VBlank;
+	// 	end
+	// end
+
+	// //Csync generation
+	// wire CSYNC_fix;
+	// csync csync_fix(video_clk, HS_fix, VS_fix, CSYNC_fix);
 
 	wire YPbPr_sync, YPbPr_blank;
 	vga_out ybpr_video
 	(
 		.clk(video_clk),
 		.ypbpr_en(1'b1),
-		.csync(ANALOGIZER_CSYNC),
-		.de(ANALOGIZER_DE),
-		.din({R_fix&{8{ANALOGIZER_DE}},G_fix&{8{ANALOGIZER_DE}},B_fix&{8{ANALOGIZER_DE}}}), //NES specific override, because not zero color data while blanking period.
+		.csync(Csync),
+		.de(BLANKn),
+		.din({R&{8{BLANKn}},G&{8{BLANKn}},B&{8{BLANKn}}}), //NES specific override, because not zero color data while blanking period.
 		.dout({PrOut,Yout,PbOut}),
 		.csync_o(YPbPr_sync),
 		.de_o(YPbPr_blank)
@@ -364,10 +352,10 @@ end
 		.clk(i_clk),
 		.PHASE_INC(CHROMA_PHASE_INC),
 		.PAL_EN(PALFLAG),
-		.hsync(HS),
-		.vsync(VS),
-		.csync(ANALOGIZER_CSYNC),
-    	.din({R_fix&{8{ANALOGIZER_DE}},G_fix&{8{ANALOGIZER_DE}},B_fix&{8{ANALOGIZER_DE}}}),
+		.hsync(Hsync),
+		.vsync(Vsync),
+		.csync(Csync),
+    	.din({R&{8{BLANKn}},G&{8{BLANKn}},B&{8{BLANKn}}}),
 		.dout(yc_o),
 		.hsync_o(),
 		.vsync_o(),
@@ -380,14 +368,14 @@ end
 		.clk_vid(i_clk),
 		.hq2x(SC_fx[2]),
 
-		.ce_pix(CE),
-		.hs_in(HS),
-		.vs_in(VS),
-		.hb_in(HBL),
-		.vb_in(VBL),
-		.r_in({R_fix[7:0]&{8{ANALOGIZER_DE}}}),
-		.g_in({G_fix[7:0]&{8{ANALOGIZER_DE}}}),
-		.b_in({B_fix[7:0]&{8{ANALOGIZER_DE}}}),
+		.ce_pix(ce_pix),
+		.hs_in(Hsync),
+		.vs_in(Vsync),
+		.hb_in(Hblank),
+		.vb_in(Vblank),
+		.r_in({R[7:0]&{8{BLANKn}}}),
+		.g_in({G[7:0]&{8{BLANKn}}}),
+		.b_in({B[7:0]&{8{BLANKn}}}),
 
 		.ce_pix_out(ce_pix_Sd),
 		.hs_out(Hsync_Sd),
@@ -404,15 +392,15 @@ end
 	reg CE_PIX_SL, DE_SL ;
 
 	always @(posedge video_clk) begin
-		Hsync_SL <= (scandoubler) ? Hsync_Sd : HS;
-		Vsync_SL <= (scandoubler) ? Vsync_Sd : VS;
-		Hblank_SL <= (scandoubler) ? Hblank_Sd : HBL;
-		Vblank_SL <= (scandoubler) ? Vblank_Sd : VBL;
-		R_SL <= (scandoubler) ? R_Sd    : {R_fix[7:0]&{8{ANALOGIZER_DE}}};
-		G_SL <= (scandoubler) ? G_Sd    : {G_fix[7:0]&{8{ANALOGIZER_DE}}};
-		B_SL <= (scandoubler) ? B_Sd    : {B_fix[7:0]&{8{ANALOGIZER_DE}}};
-		CE_PIX_SL <= (scandoubler) ? ce_pix_Sd : CE;
-		DE_SL <= ANALOGIZER_DE;
+		Hsync_SL <= (scandoubler) ? Hsync_Sd : Hsync;
+		Vsync_SL <= (scandoubler) ? Vsync_Sd : Vsync;
+		Hblank_SL <= (scandoubler) ? Hblank_Sd : Hblank;
+		Vblank_SL <= (scandoubler) ? Vblank_Sd : Vblank;
+		R_SL <= (scandoubler) ? R_Sd    : {R[7:0]&{8{BLANKn}}};
+		G_SL <= (scandoubler) ? G_Sd    : {G[7:0]&{8{BLANKn}}};
+		B_SL <= (scandoubler) ? B_Sd    : {B[7:0]&{8{BLANKn}}};
+		CE_PIX_SL <= (scandoubler) ? ce_pix_Sd : ce_pix;
+		DE_SL <= BLANKn;
 	end
 
 
@@ -461,30 +449,4 @@ scanlines_analogizer #(0) VGA_scanlines
 	assign cart_tran_pin31         = i_rst | ~i_ena ? 1'bz : ((CART_PIN31_DIR) ? CART_PIN31_OUT : 1'bZ); //on reset state set ouput value to 4'hf
 	assign cart_tran_pin31_dir     = i_rst | ~i_ena ? 1'b0 : CART_PIN31_DIR;                            //on reset state set pin dir to input
 	assign CART_PIN31_IN           = cart_tran_pin31;
-endmodule
-
-module sync_fix
-(
-	input clk,
-	
-	input sync_in,
-	output sync_out
-);
-
-assign sync_out = sync_in ^ pol;
-
-reg pol;
-always @(posedge clk) begin
-	reg [31:0] cnt;
-	reg s1,s2;
-
-	s1 <= sync_in;
-	s2 <= s1;
-	cnt <= s2 ? (cnt - 1) : (cnt + 1);
-
-	if(~s2 & s1) begin
-		cnt <= 0;
-		pol <= cnt[31];
-	end
-end
 endmodule

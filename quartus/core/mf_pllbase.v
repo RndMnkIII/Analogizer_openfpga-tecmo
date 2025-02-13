@@ -52,7 +52,7 @@ endmodule
 //	their respective licensors.  No other licenses, including any licenses
 //	needed under any third party's intellectual property, are provided herein.
 //-->
-// Retrieval info: <instance entity-name="altera_pll" version="21.1" >
+// Retrieval info: <instance entity-name="altera_pll" version="18.1" >
 // Retrieval info: 	<generic name="debug_print_output" value="false" />
 // Retrieval info: 	<generic name="debug_use_rbc_taf_method" value="false" />
 // Retrieval info: 	<generic name="device_family" value="Cyclone V" />

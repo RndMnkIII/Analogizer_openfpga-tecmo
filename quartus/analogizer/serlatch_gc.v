@@ -177,9 +177,9 @@ module serlatch_game_controller #(parameter MASTER_CLK_FREQ=53_600_000)
     reg [15:0] p1b_r;
     reg [15:0] p2b_r;
 
-    wire latch_level /* synthesis keep */;
-    wire disable_clock_on_latch /* synthesis keep */;
-    wire sample_data /* synthesis keep */;
+    wire latch_level ;
+    wire disable_clock_on_latch ;
+    wire sample_data ;
 
     //always sample data at falling edge of o_clk starting and second clock pulse in latch phase.
     assign sample_data = ~counter[0] && i_stb && (counter > 1) && (counter <= counter_top_value);
