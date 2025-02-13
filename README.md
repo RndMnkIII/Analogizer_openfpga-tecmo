@@ -3,7 +3,7 @@
 
 * [2.1] **Analogizer** support added by **RndMnkIII** and based on **nullobject** openfpga-tecmo Pocket port. See more in the Analogizer main repository: [Analogizer](https://github.com/RndMnkIII/Analogizer) [13/02/2025].
 
-This Analogizer core use a configuration file to select Analogizer adapter options, not based on the Pocket's menu system. It is necessary to use [Pupdate](https://github.com/mattpannella/pupdate) release >= 4.3.1 or run an external [utility](https://github.com/RndMnkIII/AnalogizerConfigurator) to generate such a file. Once generated, you must copy the `analogizer.bin` file to the `/Assets/analogizer/common` folder on the Pocket SD card. If this folder does not exist, you must create it or if you have already extracted the Amiga core distribution file it will be created. Pupdate does all actions automatically after running this tool. Inside Pupdate navigate to: `Pocket Setup>Analogizer Config>Standard Analogizer Config`, choose Analogizer settings and exit to save to file.
+This Analogizer core use a configuration file to select Analogizer adapter options, not based on the Pocket's menu system. It is necessary to use [Pupdate](https://github.com/mattpannella/pupdate) release >= 4.3.1 or run an external [utility](https://github.com/RndMnkIII/AnalogizerConfigurator) to generate such a file. Once generated, you must copy the `analogizer.bin` file to the `/Assets/analogizer/common` folder on the Pocket SD card. If this folder does not exist, you must create it. Pupdate does all actions automatically after running this tool. Inside Pupdate navigate to: `Pocket Setup>Analogizer Config>Standard Analogizer Config`, choose Analogizer settings and exit to save to file.
 
 
 
